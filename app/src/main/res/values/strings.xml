@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">COMP304_TeamProject</string>
+    <array name="functions">
+        <item>BMI Calculator</item>
+        <item>Map</item>
+        <item>TODO</item>
+    </array>
 </resources>
