@@ -5,4 +5,5 @@
         <item>Map</item>
         <item>TODO</item>
     </array>
+    <string name="title_activity_maps">Map</string>
 </resources>
