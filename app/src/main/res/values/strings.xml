@@ -3,7 +3,9 @@
     <array name="functions">
         <item>BMI Calculator</item>
         <item>Map</item>
-        <item>TODO</item>
+        <item>Daily Calorie Intake</item>
     </array>
     <string name="title_activity_maps">Map</string>
+
+    <!-- calorie intake strings -->
 </resources>
