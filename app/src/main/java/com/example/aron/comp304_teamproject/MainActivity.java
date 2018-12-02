@@ -30,11 +30,11 @@ public class MainActivity extends AppCompatActivity {
                     case 1:
                         intent = new Intent(MainActivity.this,MapsActivity.class);
                         intent.putExtra("selectedSetting",selectedSetting );
-
                         startActivity(intent);
                         break;
                     case 2:
-
+                        intent = new Intent (MainActivity.this, CalorieIntakeActivity.class);
+                        startActivity(intent);
                         break;
                     case 3:
 

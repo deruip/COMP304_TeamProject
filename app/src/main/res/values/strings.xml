@@ -7,5 +7,32 @@
     </array>
     <string name="title_activity_maps">Map</string>
 
-    <!-- calorie intake strings -->
+    <!-- calorie intake -->
+    <string name="calorieIntakeTitle">Calorie Intake Calculator</string>
+    <string name="age">Age: </string>
+    <string name="gender">Gender: </string>
+    <string name="gender_Male">Male</string>
+    <string name="gender_Female">Female</string>
+    <string name="weight">Weight: </string>
+    <string name="weight_Pounds">Pounds</string>
+    <string name="weight_Kilo">Kilograms</string>
+    <string name="height">Height: </string>
+    <string name="height_Metric">cm</string>
+    <string name="height_Imperial">Feet and Inches</string>
+    <string name="height_Imperial_Feet">Feet</string>
+    <string name="height_Imperial_Inch">Inch</string>
+    <string name="exerciseLevel">Exercise Routine: </string>
+    <string name="calculate">Calculate Calories</string>
+
+    <dimen name="font_title">25sp</dimen>
+    <dimen name="font_other">22sp</dimen>
+    <dimen name="dimen_10dp">10dp</dimen>
+
+    <array name="spinner_CalorieIntake">
+        <item>Daily</item>
+        <item>More than 5 times per week</item>
+        <item>Less than 4 times per week</item>
+        <item>Once / Twice per week</item>
+        <item>Light / No exercise</item>
+    </array>
 </resources>
