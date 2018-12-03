@@ -5,6 +5,7 @@ package com.example.aron.comp304_teamproject;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -30,11 +31,55 @@ public class CalorieIntakeActivity extends AppCompatActivity {
     public RadioGroup radioGroup_Height;
     public RadioGroup radioGroup_Weight;
 
+    public RadioButton rb_Metric;
+    public RadioButton rb_Imperial;
+
     public Spinner spinner;
 
     public String gender; //store gender choice
 
+    int calorieValue; // total calories
+
     public boolean isKilo = false;
+    public boolean isMetric = false;
+    public boolean isFemale = false;
+
+    final double convertToPounds = 2.20462;
+    final int femaleDeduction = 150; // if isFemale is true, deduct with this value
+
+    //number checks
+
+    //age
+    int youngAge = 18;
+    int middleAge = 35;
+    int oldAge = 50;
+
+    //weight - pounds
+    int lightPound = 100;
+    int mediumPound = 160;
+    int heavyPound = 210;
+
+    //weight - kilo
+    int lightKilo = 45;
+    int mediumKilo = 54;
+    int heavyKilo = 75;
+
+    //height - metric
+    int small = 150;
+    int medium = 165;
+    int tall = 180;
+
+    //height - imperial
+    int feetSmall = 5;
+    int feetMedium = 6;
+    int feetTall = 7;
+
+    int inches = 12;
+
+
+
+
+
 
 
     @Override
@@ -74,11 +119,13 @@ public class CalorieIntakeActivity extends AppCompatActivity {
                     if(rb1.isChecked())
                     {
                         gender = rb1.getText().toString();
+                        isFemale = false;
                         Toast.makeText(CalorieIntakeActivity.this, gender, Toast.LENGTH_SHORT).show();
                     }
                     if (rb2.isChecked())
                     {
                         gender = rb2.getText().toString();
+                        isFemale = true;
                         Toast.makeText(CalorieIntakeActivity.this, gender, Toast.LENGTH_SHORT).show();
                     }
                 }
@@ -114,11 +161,11 @@ public class CalorieIntakeActivity extends AppCompatActivity {
         radioGroup_Height.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                RadioButton rb1 = findViewById(R.id.height_Metric);
-                RadioButton rb2 = findViewById(R.id.height_Imperial);
+                rb_Metric = findViewById(R.id.height_Metric);
+                rb_Imperial = findViewById(R.id.height_Imperial);
                 if(checkedId != 1)
                 {
-                    if(rb1.isChecked())
+                    if(rb_Metric.isChecked())
                     {
                         heightText_Metric.setVisibility(View.VISIBLE);
                         height.setVisibility(View.VISIBLE);
@@ -126,8 +173,9 @@ public class CalorieIntakeActivity extends AppCompatActivity {
                         height_Feet.setVisibility(View.GONE);
                         heightText_Inch.setVisibility(View.GONE);
                         height_Inch.setVisibility(View.GONE);
+                        isMetric = false;
                     }
-                    if (rb2.isChecked())
+                    if (rb_Imperial.isChecked())
                     {
                         heightText_Metric.setVisibility(View.GONE);
                         height.setVisibility(View.GONE);
@@ -135,14 +183,161 @@ public class CalorieIntakeActivity extends AppCompatActivity {
                         height_Feet.setVisibility(View.VISIBLE);
                         heightText_Inch.setVisibility(View.VISIBLE);
                         height_Inch.setVisibility(View.VISIBLE);
+                        isMetric = true;
                     }
                 }
             }
         });
     }
 
+
+
     public void CalculateCalories(View view)
     {
 
+        //get and store values from user input
+        final int getAge;
+        final double getWeight;
+        final double getHeight;
+        final int getHeightFeet;
+        final int getHeightInch;
+
+
+        getAge =  Integer.parseInt(age.getText().toString());
+
+
+        if(isKilo)
+        {
+            getWeight = Double.parseDouble(weight.getText().toString()) * convertToPounds;
+        }
+        else
+        {
+            getWeight = Integer.parseInt(weight.getText().toString());
+        }
+
+        if(isMetric)
+        {
+            getHeight = Integer.parseInt(height.getText().toString());
+        }
+        else
+        {
+            getHeightFeet = Integer.parseInt(height_Feet.getText().toString());
+            getHeightInch = Integer.parseInt(height_Inch.getText().toString());
+        }
+
+
+
+        calorieValue = calorieValue + 1000;
+
+
+        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                switch (position)
+                {
+                    //Daily Exercise
+                    case 0:
+                        //young age
+                        if(getAge >= youngAge && getAge <= middleAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 950;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 1350;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1600;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1100;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1250;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1450;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1300;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1550;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1800;
+                                if (isFemale)
+                                {
+                                    calorieValue = calorieValue - femaleDeduction;
+                                }
+                            }
+                        }
+                }
+            }
+        });
     }
 }
+
