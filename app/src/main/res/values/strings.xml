@@ -8,7 +8,7 @@
     <string name="title_activity_maps">Map</string>
 
     <!-- calorie intake -->
-    <string name="calorieIntakeTitle">Calorie Intake Calculator</string>
+    <string name="calorieIntakeTitle">Daily Calorie Intake Calculator</string>
     <string name="age">Age: </string>
     <string name="gender">Gender: </string>
     <string name="gender_Male">Male</string>
@@ -23,16 +23,18 @@
     <string name="height_Imperial_Inch">Inch</string>
     <string name="exerciseLevel">Exercise Routine: </string>
     <string name="calculate">Calculate Calories</string>
+    <string name="resetButton">Reset</string>
+    <string name="maintainWeight">Maintain Current Weight: </string>
+    <string name="weightLoss">Weight Loss Calorie Count: </string>
 
     <dimen name="font_title">25sp</dimen>
-    <dimen name="font_other">22sp</dimen>
+    <dimen name="font_other">20sp</dimen>
     <dimen name="dimen_10dp">10dp</dimen>
 
     <array name="spinner_CalorieIntake">
         <item>Daily</item>
         <item>More than 5 times per week</item>
-        <item>Less than 4 times per week</item>
-        <item>Once / Twice per week</item>
-        <item>Light / No exercise</item>
+        <item>Less then 4 times per week</item>
+        <item>Little / No Exercise</item>
     </array>
 </resources>

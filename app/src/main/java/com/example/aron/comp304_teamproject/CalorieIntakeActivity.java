@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -15,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class CalorieIntakeActivity extends AppCompatActivity {
-
     public EditText age;
     public EditText weight;
     public EditText height;
@@ -26,6 +26,12 @@ public class CalorieIntakeActivity extends AppCompatActivity {
     public TextView heightText_Feet;
     public TextView heightText_Inch;
 
+    public TextView calorieMaintain;
+    public TextView weightLoss;
+
+    public Spinner sp;
+
+
 
     public RadioGroup radioGroup_Gender;
     public RadioGroup radioGroup_Height;
@@ -33,6 +39,9 @@ public class CalorieIntakeActivity extends AppCompatActivity {
 
     public RadioButton rb_Metric;
     public RadioButton rb_Imperial;
+
+    public Button button;
+    public Button resetButton;
 
     public Spinner spinner;
 
@@ -43,11 +52,17 @@ public class CalorieIntakeActivity extends AppCompatActivity {
     public boolean isKilo = false;
     public boolean isMetric = false;
     public boolean isFemale = false;
+    public boolean isPressed = false;
 
     final double convertToPounds = 2.20462;
     final int femaleDeduction = 150; // if isFemale is true, deduct with this value
 
-    //number checks
+    //get values from edittexts
+    int getAge;
+    double getWeight;
+    double getHeight;
+    int getHeightFeet;
+    int getHeightInch;
 
     //age
     int youngAge = 18;
@@ -55,31 +70,26 @@ public class CalorieIntakeActivity extends AppCompatActivity {
     int oldAge = 50;
 
     //weight - pounds
-    int lightPound = 100;
-    int mediumPound = 160;
-    int heavyPound = 210;
+    double lightPound = 100.0;
+    double mediumPound = 160.0;
+    double heavyPound = 210.0;
 
     //weight - kilo
-    int lightKilo = 45;
-    int mediumKilo = 54;
-    int heavyKilo = 75;
+    double lightKilo = 45.0;
+    double mediumKilo = 54.0;
+    double heavyKilo = 75.0;
 
     //height - metric
-    int small = 150;
-    int medium = 165;
-    int tall = 180;
+    double small = 150.0;
+    double medium = 165.0;
+    double tall = 180.0;
 
     //height - imperial
-    int feetSmall = 5;
-    int feetMedium = 6;
-    int feetTall = 7;
+    double feetSmall = 5.0;
+    double feetMedium = 6.0;
+    double feetTall = 7.0;
 
-    int inches = 12;
-
-
-
-
-
+    double inches = 12.0;
 
 
     @Override
@@ -97,13 +107,28 @@ public class CalorieIntakeActivity extends AppCompatActivity {
         heightText_Feet = findViewById(R.id.heightText_Feet);
         heightText_Inch = findViewById(R.id.heightText_Inch);
 
+        calorieMaintain = findViewById(R.id.text_MaintainWeight);
+        weightLoss = findViewById(R.id.text_WeightLoss);
 
-        //exercise level spinner and putting string array
+        button = findViewById(R.id.calculate_Calories);
+        resetButton = findViewById(R.id.resetButton);
+
         String[] getExerciseArray = getResources().getStringArray(R.array.spinner_CalorieIntake);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item, getExerciseArray);
+        sp = findViewById(R.id.spinner_ExerciseRoutine);
+        sp.setAdapter(adapter);
 
-        spinner = findViewById(R.id.spinner_ExerciseRoutine);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_dropdown_item, getExerciseArray);
-        spinner.setAdapter(adapter);
+
+        calorieMaintain.setVisibility(View.INVISIBLE);
+        weightLoss.setVisibility(View.INVISIBLE);
+
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CalculateCalories(v);
+            }
+        });
 
         //gender radio buttons
         radioGroup_Gender = findViewById(R.id.gender_Group);
@@ -120,17 +145,18 @@ public class CalorieIntakeActivity extends AppCompatActivity {
                     {
                         gender = rb1.getText().toString();
                         isFemale = false;
-                        Toast.makeText(CalorieIntakeActivity.this, gender, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(CalorieIntakeActivity.this, gender, Toast.LENGTH_SHORT).show();
                     }
                     if (rb2.isChecked())
                     {
                         gender = rb2.getText().toString();
                         isFemale = true;
-                        Toast.makeText(CalorieIntakeActivity.this, gender, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(CalorieIntakeActivity.this, gender, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
         });
+
 
         //weight unit radio buttons
         radioGroup_Weight = findViewById(R.id.weight_Unit);
@@ -173,7 +199,7 @@ public class CalorieIntakeActivity extends AppCompatActivity {
                         height_Feet.setVisibility(View.GONE);
                         heightText_Inch.setVisibility(View.GONE);
                         height_Inch.setVisibility(View.GONE);
-                        isMetric = false;
+                        isMetric = true;
                     }
                     if (rb_Imperial.isChecked())
                     {
@@ -183,28 +209,29 @@ public class CalorieIntakeActivity extends AppCompatActivity {
                         height_Feet.setVisibility(View.VISIBLE);
                         heightText_Inch.setVisibility(View.VISIBLE);
                         height_Inch.setVisibility(View.VISIBLE);
-                        isMetric = true;
+                        isMetric = false;
                     }
                 }
             }
         });
     }
-
-
-
     public void CalculateCalories(View view)
     {
+        isPressed = true;
+        //exercise level spinner and putting string array
+        String[] getExerciseArray = getResources().getStringArray(R.array.spinner_CalorieIntake);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_dropdown_item, getExerciseArray);
+        sp = findViewById(R.id.spinner_ExerciseRoutine);
+        sp.setAdapter(adapter);
 
-        //get and store values from user input
-        final int getAge;
-        final double getWeight;
-        final double getHeight;
-        final int getHeightFeet;
-        final int getHeightInch;
+        calorieMaintain.setVisibility(View.VISIBLE);
+        weightLoss.setVisibility(View.VISIBLE);
+        resetButton.setVisibility(View.VISIBLE);
 
 
-        getAge =  Integer.parseInt(age.getText().toString());
 
+
+        getAge = Integer.parseInt(age.getText().toString());
 
         if(isKilo)
         {
@@ -218,25 +245,25 @@ public class CalorieIntakeActivity extends AppCompatActivity {
         if(isMetric)
         {
             getHeight = Integer.parseInt(height.getText().toString());
+            getHeightFeet = 0;
+            getHeightInch = 0;
         }
         else
         {
             getHeightFeet = Integer.parseInt(height_Feet.getText().toString());
             getHeightInch = Integer.parseInt(height_Inch.getText().toString());
+            getHeight = 0;
         }
 
 
-
-        calorieValue = calorieValue + 1000;
-
-
-        spinner.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                calorieValue = 0;
+                calorieValue = calorieValue + 1000;
                 switch (position)
                 {
-                    //Daily Exercise
+                    //Daily
                     case 0:
                         //young age
                         if(getAge >= youngAge && getAge <= middleAge)
@@ -246,98 +273,776 @@ public class CalorieIntakeActivity extends AppCompatActivity {
                                     (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 950;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
                             //light weight - medium height
                             else if ((getWeight >= lightPound && getWeight < mediumPound) &&
                                     (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
                             {
                                 calorieValue = calorieValue + 1350;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
                             //light weight - tall height
                             else if ((getWeight >= lightPound && getWeight < mediumPound) &&
                                     (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 1600;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
-                ////////////////////////////////////////////////////////////////////////
+                            ////////////////////////////////////////////////////////////////////////
                             //medium weight - short height
                             else if ((getWeight > mediumPound && getWeight < heavyPound) &&
                                     (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 1100;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
                             //medium weight - medium height
                             else if ((getWeight > mediumPound && getWeight < heavyPound) &&
                                     (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 1250;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
                             //medium weight - tall height
                             else if ((getWeight > mediumPound && getWeight < heavyPound) &&
                                     (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 1450;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
-
                             ////////////////////////////////////////////////////////////////////////
                             //heavy weight - short height
                             else if ((getWeight >= heavyPound) &&
                                     (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 1300;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
                             //heavy weight - medium height
                             else if ((getWeight >= heavyPound) &&
                                     (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 1550;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
                             }
                             //heavy weight - tall height
                             else if ((getWeight >= heavyPound) &&
                                     (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
                             {
                                 calorieValue = calorieValue + 1800;
-                                if (isFemale)
-                                {
-                                    calorieValue = calorieValue - femaleDeduction;
-                                }
+                            }
+
+                        }
+                        //middle aged
+                        else if(getAge > middleAge && getAge < oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 1200;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1450;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1150;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1350;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1200;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1400;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1650;
                             }
                         }
+                        //senior
+                        else if(getAge > oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 600;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 800;
+
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 750;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1100;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1150;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1400;
+                            }
+                        }
+                        break;
+                        //More than 4 times per week
+                    case 1:
+                        //young age
+                        if(getAge >= youngAge && getAge <= middleAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 1100;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1350;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 950;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1100;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1250;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1050;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1300;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1500;
+                            }
+                        }
+                        //middle aged
+                        else if(getAge > middleAge && getAge < oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 750;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 1050;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1300;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1050;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1250;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1050;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1250;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1400;
+                            }
+                        }
+                        //senior
+                        else if(getAge > oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 550;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 700;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 850;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 650;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 850;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1050;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1250;
+                            }
+                        }
+                        break;
+                        //5 Times per week
+                    case 2:
+                        //young age
+                        if(getAge >= youngAge && getAge <= middleAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 700;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1300;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1150;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1200;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1350;
+                            }
+                        }
+                        //middle aged
+                        else if(getAge > middleAge && getAge < oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 700;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1200;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1050;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1250;
+                            }
+                        }
+                        //senior
+                        else if(getAge > oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 475;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 600;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 750;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 600;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 750;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 975;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1050;
+                            }
+                        }
+                        break;
+                        //3 times per week
+                    case 3:
+                        //young age
+                        if(getAge >= youngAge && getAge <= middleAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 600;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 850;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1100;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1000;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1100;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1200;
+                            }
+                        }
+                        //middle aged
+                        else if(getAge > middleAge && getAge < oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 650;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 825;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1100;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 725;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 975;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 850;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 1125;
+                            }
+                        }
+                        //senior
+                        else if(getAge > oldAge)
+                        {
+                            //light weight - short height
+                            if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 425;
+                            }
+                            //light weight - medium height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches ))
+                            {
+                                calorieValue = calorieValue + 525;
+                            }
+                            //light weight - tall height
+                            else if ((getWeight >= lightPound && getWeight < mediumPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 650;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //medium weight - short height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 550;
+                            }
+                            //medium weight - medium height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 700;
+                            }
+                            //medium weight - tall height
+                            else if ((getWeight > mediumPound && getWeight < heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 800;
+                            }
+                            ////////////////////////////////////////////////////////////////////////
+                            //heavy weight - short height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= small && getHeight < medium || getHeightFeet == feetSmall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 700;
+                            }
+                            //heavy weight - medium height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight >= medium && getHeight <= tall || getHeightFeet == feetMedium && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 850;
+                            }
+                            //heavy weight - tall height
+                            else if ((getWeight >= heavyPound) &&
+                                    (getHeight > tall || getHeightFeet == feetTall && getHeightInch < inches))
+                            {
+                                calorieValue = calorieValue + 900;
+                            }
+                        }
+                        break;
                 }
+                if (isFemale)
+                {
+                    calorieValue = calorieValue - femaleDeduction;
+                }
+                //Toast.makeText(CalorieIntakeActivity.this, String.valueOf(calorieValue) + " pt2", Toast.LENGTH_SHORT).show();
+                calorieMaintain.setText(getString(R.string.maintainWeight) + "\n" + calorieValue);
+
+                double cutCalories = calorieValue * 0.80;
+                weightLoss.setText(getString(R.string.weightLoss) + "\n" + (int)cutCalories);
+
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
+        button.setVisibility(View.GONE);
+
     }
+
+    public void Reset(View view)
+    {
+        age.setText("");
+        weight.setText("");
+        if(isMetric)
+        {
+            height.setText("");
+        }
+        else
+        {
+            height_Feet.setText("");
+            height_Inch.setText("");
+        }
+
+        radioGroup_Gender.clearCheck();
+        radioGroup_Height.clearCheck();
+        radioGroup_Weight.clearCheck();
+
+        sp.setSelection(0);
+
+        calorieMaintain.setVisibility(View.INVISIBLE);
+        weightLoss.setVisibility(View.INVISIBLE);
+        button.setVisibility(View.VISIBLE);
+
+    }
+
 }
 

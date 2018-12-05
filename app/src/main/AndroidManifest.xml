@@ -43,7 +43,11 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".CalorieIntakeActivity"></activity>
+        <activity android:name=".CalorieIntakeActivity" />
+
+        <service android:enabled="true" android:name="com.example.aron.comp304_teamproject.BackgroundMusicService" android:stopWithTask="true">
+
+        </service>
     </application>
 
 </manifest>
