@@ -21,7 +21,6 @@ import java.util.List;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     static LatLng place = new LatLng(43.6426, -79.3871);
-    String PName;
     boolean street = true;
 
     private GoogleMap gMap;
@@ -104,10 +103,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .title("Wynn Fitness Clubs ")
                 .snippet("10 Milner Business Ct, Scarborough, ON M1B 3C6"));
 
-        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place, 10));
+        gMap.moveCamera(CameraUpdateFactory.newLatLngZoom(place, 100));
 
         // Zoom in, animating the camera.
-        gMap.animateCamera(CameraUpdateFactory.zoomTo(500), 6000, null);
+        gMap.animateCamera(CameraUpdateFactory.zoomTo(500), 5000, null);
 
     }
 }
