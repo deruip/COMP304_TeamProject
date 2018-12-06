@@ -1,10 +1,14 @@
 package com.example.aron.comp304_teamproject;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -12,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,14 +53,10 @@ public class BMIActivity extends AppCompatActivity {
         result = findViewById(R.id.result);
 
 
-
-
-
         rg_units.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(rb_metric.isChecked())
-                {
+                if (rb_metric.isChecked()) {
                     height_label.setText(R.string.bmi_height_metric);
                     weight_label.setText(R.string.bmi_weight_metric);
                     et_height_metric.setVisibility(View.VISIBLE);
@@ -66,8 +67,7 @@ public class BMIActivity extends AppCompatActivity {
                     clearAll();
                     isMetric = true;
                 }
-                if (rb_imperial.isChecked())
-                {
+                if (rb_imperial.isChecked()) {
                     height_label.setText(R.string.bmi_height_imperial);
                     weight_label.setText(R.string.bmi_weight_imperial);
                     et_height_metric.setVisibility(View.GONE);
@@ -84,35 +84,30 @@ public class BMIActivity extends AppCompatActivity {
         new DownloadImageTask().execute("https://i.imgur.com/L3hY6lj.png");
 
 
-
-
     }
-    public void clearAll()
-    {
+
+    public void clearAll() {
         et_height_metric.setText("");
         et_height_feet.setText("");
         et_height_inch.setText("");
         et_weight.setText("");
     }
-    public void calculateBMI(View view)
-    {
-        if (isMetric)
-        {
+
+    public void calculateBMI(View view) {
+        if (isMetric) {
             float weight = Float.parseFloat(et_weight.getText().toString());
             float height = Float.parseFloat(et_height_metric.getText().toString()) / 100;
             BMI = weight / (height * height);
-        }
-        else
-        {
+        } else {
             float feetToInches = Float.parseFloat(et_height_feet.getText().toString()) * 12;
-            float height = Float.parseFloat(et_height_inch.getText().toString()) + feetToInches ;
+            float height = Float.parseFloat(et_height_inch.getText().toString()) + feetToInches;
             float weight = Float.parseFloat(et_weight.getText().toString());
-            BMI = (weight / (height * height)) * 703 ;
+            BMI = (weight / (height * height)) * 703;
         }
         result.setText(String.format("Your BMI is %.02f", BMI));
     }
-    private InputStream OpenHttpConnection(String urlString) throws IOException
-    {
+
+    private InputStream OpenHttpConnection(String urlString) throws IOException {
         InputStream in = null;
         int response = -1;
 
@@ -121,7 +116,7 @@ public class BMIActivity extends AppCompatActivity {
 
         if (!(conn instanceof HttpURLConnection))
             throw new IOException("Not an HTTP connection");
-        try{
+        try {
             HttpURLConnection httpConn = (HttpURLConnection) conn;
             httpConn.setAllowUserInteraction(false);
             httpConn.setInstanceFollowRedirects(true);
@@ -131,16 +126,14 @@ public class BMIActivity extends AppCompatActivity {
             if (response == HttpURLConnection.HTTP_OK) {
                 in = httpConn.getInputStream();
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             Log.d("Networking", ex.getLocalizedMessage());
             throw new IOException("Error connecting");
         }
         return in;
     }
-    private Bitmap DownloadImage(String URL)
-    {
+
+    private Bitmap DownloadImage(String URL) {
         Bitmap bitmap = null;
         InputStream in = null;
         try {
