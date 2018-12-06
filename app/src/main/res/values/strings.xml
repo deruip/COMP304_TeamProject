@@ -19,13 +19,23 @@
     <string name="height">Height: </string>
     <string name="height_Metric">cm</string>
     <string name="height_Imperial">Feet and Inches</string>
-    <string name="height_Imperial_Feet">Feet</string>
-    <string name="height_Imperial_Inch">Inch</string>
+    <string name="height_Imperial_Feet">Feet:</string>
+    <string name="height_Imperial_Inch">Inches:</string>
     <string name="exerciseLevel">Exercise Routine: </string>
     <string name="calculate">Calculate Calories</string>
     <string name="resetButton">Reset</string>
     <string name="maintainWeight">Maintain Current Weight: </string>
     <string name="weightLoss">Weight Loss Calorie Count: </string>
+
+    <string name="bmi_title">Body Mass Index Calculator</string>
+    <string name="imperial">Imperial</string>
+    <string name="metric">Metric</string>
+    <string name="bmi_height_metric">Height (cm)</string>
+    <string name="bmi_height_imperial">Height (ft and in)</string>
+    <string name="bmi_weight_metric">Weight (kg)</string>
+    <string name="bmi_weight_imperial">Weight (lbs)</string>
+    <string name="bmi_calculate">Calculate BMI</string>
+
 
     <dimen name="font_title">25sp</dimen>
     <dimen name="font_other">20sp</dimen>

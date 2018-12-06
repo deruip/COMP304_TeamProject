@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
                 switch (position)
                 {
                     case 0:
-
+                        intent = new Intent (MainActivity.this, BMIActivity.class);
+                        startActivity(intent);
                         break;
                     case 1:
                         intent = new Intent(MainActivity.this,MapsActivity.class);
@@ -42,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
                         intent = new Intent (MainActivity.this, CalorieIntakeActivity.class);
                         startActivity(intent);
                         break;
-                    case 3:
-
-                        break;
-
                 }
 
 

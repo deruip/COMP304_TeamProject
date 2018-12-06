@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".BMIActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/bmi_title"
+        android:textAlignment="center"
+        android:textSize="@dimen/font_title"/>
+
+    <RadioGroup
+        android:id="@+id/units_system"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/metric"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/metric"/>
+
+        <RadioButton
+            android:id="@+id/imperial"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/imperial"/>
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/bmi_height_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bmi_height_metric"
+        android:textSize="@dimen/font_other"/>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/bmi_height_metric"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            />
+
+        <TextView
+            android:id="@+id/bmi_height_feet_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/height_Imperial_Feet"
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:visibility="gone"
+            />
+        <EditText
+            android:id="@+id/bmi-height_feet"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:visibility="gone"
+            android:inputType="number"
+            />
+
+        <TextView
+            android:id="@+id/bmi_height_inch_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/height_Imperial_Inch"
+            android:layout_marginRight="@dimen/dimen_10dp"
+            android:visibility="gone"
+            />
+        <EditText
+            android:id="@+id/bmi_height_inch"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:inputType="number"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/bmi_weight_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bmi_weight_metric"
+        android:textSize="@dimen/font_other"/>
+    <EditText
+        android:id="@+id/bmi_weight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"/>
+
+    <Button
+        android:id="@+id/calculate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/bmi_calculate"
+        android:onClick="calculateBMI"/>
+
+    <TextView
+        android:id="@+id/result"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:layout_width="254dp"
+        android:layout_height="213dp"
+        android:id="@+id/imageView"
+        />
+
+</LinearLayout>
